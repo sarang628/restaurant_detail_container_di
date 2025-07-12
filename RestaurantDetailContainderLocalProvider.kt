@@ -28,12 +28,12 @@ val customRestaurantOverviewInRestaurantDetailContainer : RestaurantOverviewInRe
         LocalRestaurantOverViewImageLoader provides restaurantOverViewImageLoader,
         LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo,
     ) {
-        RestaurantOverViewScreen(restaurantId = 234)
+        RestaurantOverViewScreen(restaurantId = it)
     }
 }
 
 val customRestaurantMenuInRestaurantDetailContainer : RestaurantMenuInRestaurantDetailContainer = {
-    RestaurantMenuScreen(restaurantId = 234)
+    RestaurantMenuScreen(restaurantId = it)
 }
 
 val customRestaurantReviewInRestaurantDetailContainer : RestaurantReviewInRestaurantDetailContainer = {
@@ -42,17 +42,17 @@ val customRestaurantReviewInRestaurantDetailContainer : RestaurantReviewInRestau
 
 val customRestaurantGalleryInRestaurantDetailContainer : RestaurantGalleryInRestaurantDetailContainer = {
     CompositionLocalProvider(LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader) {
-    RestaurantGalleryScreen(restaurantId = 234)
+    RestaurantGalleryScreen(restaurantId = it)
     }
 }
 
-fun provideRestaurantDetailContainer() : @Composable ()->Unit = {
+fun provideRestaurantDetailContainer() : @Composable (Int)->Unit = {
     CompositionLocalProvider(
         LocalRestaurantOverviewInRestaurantDetailContainer provides customRestaurantOverviewInRestaurantDetailContainer,
         LocalRestaurantMenuInRestaurantDetailContainer provides customRestaurantMenuInRestaurantDetailContainer,
         LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer,
         LocalRestaurantGalleryInRestaurantDetailContainer provides customRestaurantGalleryInRestaurantDetailContainer,
     ) {
-        RestaurantNavScreen(restaurantId = 234)
+        RestaurantNavScreen(restaurantId = it)
     }
 }
