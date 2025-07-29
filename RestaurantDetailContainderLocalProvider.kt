@@ -3,7 +3,9 @@ package com.sarang.torang.di.restaurant_detail_container_di
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.NavBackStackEntry
 import com.sarang.torang.RestaurantNavScreen
+import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryScreen
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
 import com.sarang.torang.compose.type.RestaurantOverviewInRestaurantDetailContainer
@@ -46,13 +48,14 @@ val customRestaurantGalleryInRestaurantDetailContainer : RestaurantGalleryInRest
     }
 }
 
-fun provideRestaurantDetailContainer() : @Composable (Int)->Unit = {
+fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Composable (NavBackStackEntry)->Unit = {
+    val restaurantId = it.arguments?.getString("restaurantId")
     CompositionLocalProvider(
         LocalRestaurantOverviewInRestaurantDetailContainer provides customRestaurantOverviewInRestaurantDetailContainer,
         LocalRestaurantMenuInRestaurantDetailContainer provides customRestaurantMenuInRestaurantDetailContainer,
         LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer,
         LocalRestaurantGalleryInRestaurantDetailContainer provides customRestaurantGalleryInRestaurantDetailContainer,
     ) {
-        RestaurantNavScreen(restaurantId = it)
+        RestaurantNavScreen(restaurantId = restaurantId?.toInt() ?: 0, onBack = { rootNavController.popBackStack() })
     }
 }
