@@ -7,8 +7,9 @@ import androidx.navigation.NavBackStackEntry
 import com.sarang.torang.RestaurantNavScreen
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryScreen
+import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
+import com.sarang.torang.compose.menu.RestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
-import com.sarang.torang.compose.type.RestaurantOverviewInRestaurantDetailContainer
 import com.sarang.torang.compose.restaurantdetail.RestaurantOverViewScreen
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.LocalRestaurantGalleryInRestaurantDetailContainer
@@ -19,7 +20,9 @@ import com.sarang.torang.compose.type.LocalRestaurantOverviewRestaurantInfo
 import com.sarang.torang.compose.type.LocalRestaurantReviewInRestaurantDetailContainer
 import com.sarang.torang.compose.type.RestaurantGalleryInRestaurantDetailContainer
 import com.sarang.torang.compose.type.RestaurantMenuInRestaurantDetailContainer
+import com.sarang.torang.compose.type.RestaurantOverviewInRestaurantDetailContainer
 import com.sarang.torang.compose.type.RestaurantReviewInRestaurantDetailContainer
+import com.sarang.torang.di.image.provideTorangAsyncImage
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
@@ -48,6 +51,11 @@ val customRestaurantGalleryInRestaurantDetailContainer : RestaurantGalleryInRest
     }
 }
 
+val customLocalRestaurantMenuImageLoader : RestaurantMenuImageLoader = { modifier, url, width, height, scale ->
+    // 여기서 실제 이미지 로딩 구현 예시
+    provideTorangAsyncImage().invoke(modifier, url, width, height, scale)
+}
+
 fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Composable (NavBackStackEntry)->Unit = {
     val restaurantId = it.arguments?.getString("restaurantId")
     CompositionLocalProvider(
@@ -55,6 +63,7 @@ fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Com
         LocalRestaurantMenuInRestaurantDetailContainer provides customRestaurantMenuInRestaurantDetailContainer,
         LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer,
         LocalRestaurantGalleryInRestaurantDetailContainer provides customRestaurantGalleryInRestaurantDetailContainer,
+        LocalRestaurantMenuImageLoader provides customLocalRestaurantMenuImageLoader
     ) {
         RestaurantNavScreen(restaurantId = restaurantId?.toInt() ?: 0, onBack = { rootNavController.popBackStack() })
     }
