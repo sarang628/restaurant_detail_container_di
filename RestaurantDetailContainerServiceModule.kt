@@ -14,7 +14,7 @@ class RestaurantDetailContainerServiceModule {
     fun provideFindRestaurantNameByRestaurantId(apiRestaurant: ApiRestaurant): FindRestaurantNameByRestaurantIdUseCase {
         return object : FindRestaurantNameByRestaurantIdUseCase {
             override suspend fun invoke(restaurantId: Int): String {
-                return apiRestaurant.getRestaurantById(restaurantId).restaurantName
+                return apiRestaurant.getRestaurantById(restaurantId).restaurantName ?: ""
             }
         }
     }
