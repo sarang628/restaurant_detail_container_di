@@ -1,5 +1,6 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,12 +29,12 @@ import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
-val customRestaurantOverviewInRestaurantDetailContainer : RestaurantOverviewInRestaurantDetailContainer = {
+fun customRestaurantOverviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantOverviewInRestaurantDetailContainer = {
     CompositionLocalProvider(
         LocalRestaurantOverViewImageLoader provides restaurantOverViewImageLoader,
         LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo,
     ) {
-        RestaurantOverViewScreen(restaurantId = it)
+        RestaurantOverViewScreen(restaurantId = it, onProfile = {rootNavController.profile(it)}, onContents = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onContents: ${it}"); rootNavController.review(it)})
     }
 }
 
@@ -59,7 +60,7 @@ val customLocalRestaurantMenuImageLoader : RestaurantMenuImageLoader = { modifie
 fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Composable (NavBackStackEntry)->Unit = {
     val restaurantId = it.arguments?.getString("restaurantId")
     CompositionLocalProvider(
-        LocalRestaurantOverviewInRestaurantDetailContainer provides customRestaurantOverviewInRestaurantDetailContainer,
+        LocalRestaurantOverviewInRestaurantDetailContainer provides customRestaurantOverviewInRestaurantDetailContainer(rootNavController),
         LocalRestaurantMenuInRestaurantDetailContainer provides customRestaurantMenuInRestaurantDetailContainer,
         LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer,
         LocalRestaurantGalleryInRestaurantDetailContainer provides customRestaurantGalleryInRestaurantDetailContainer,
