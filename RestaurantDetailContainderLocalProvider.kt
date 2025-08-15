@@ -4,10 +4,13 @@ import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import com.sarang.torang.RestaurantNavScreen
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryScreen
+import com.sarang.torang.compose.feed.FeedScreenByRestaurantId
+import com.sarang.torang.compose.feed.FeedScreenByReviewId
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
@@ -23,10 +26,18 @@ import com.sarang.torang.compose.type.RestaurantGalleryInRestaurantDetailContain
 import com.sarang.torang.compose.type.RestaurantMenuInRestaurantDetailContainer
 import com.sarang.torang.compose.type.RestaurantOverviewInRestaurantDetailContainer
 import com.sarang.torang.compose.type.RestaurantReviewInRestaurantDetailContainer
+import com.sarang.torang.di.feed_di.provideBottomDetectingLazyColumn
+import com.sarang.torang.di.feed_di.shimmerBrush
 import com.sarang.torang.di.image.provideTorangAsyncImage
+import com.sarang.torang.di.main_di.provideFeed
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
+import com.sarang.torang.di.video.provideVideoPlayer
+import com.sarang.torang.viewmodels.FeedDialogsViewModel
+import com.sryang.library.pullrefresh.PullToRefreshLayout
+import com.sryang.library.pullrefresh.RefreshIndicatorState
+import com.sryang.library.pullrefresh.rememberPullToRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun customRestaurantOverviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantOverviewInRestaurantDetailContainer = {
@@ -42,8 +53,19 @@ val customRestaurantMenuInRestaurantDetailContainer : RestaurantMenuInRestaurant
     RestaurantMenuScreen(restaurantId = it)
 }
 
-val customRestaurantReviewInRestaurantDetailContainer : RestaurantReviewInRestaurantDetailContainer = {
-
+fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantReviewInRestaurantDetailContainer = {
+    val state = rememberPullToRefreshState()
+    val dialogsViewModel: FeedDialogsViewModel = hiltViewModel()
+    FeedScreenByRestaurantId(restaurantId = it,shimmerBrush = { shimmerBrush(it) },
+        feed = provideFeed(dialogsViewModel = dialogsViewModel, navController = rootNavController.navController, rootNavController = rootNavController, videoPlayer = provideVideoPlayer()),
+        pullToRefreshLayout = { isRefreshing, onRefresh, contents ->
+            if (isRefreshing) { state.updateState(RefreshIndicatorState.Refreshing) }
+            else { state.updateState(RefreshIndicatorState.Default) }
+            PullToRefreshLayout(pullRefreshLayoutState = state, refreshThreshold = 80, onRefresh = onRefresh) {
+                contents.invoke() }
+        },
+        bottomDetectingLazyColumn = provideBottomDetectingLazyColumn()
+        )
 }
 
 val customRestaurantGalleryInRestaurantDetailContainer : RestaurantGalleryInRestaurantDetailContainer = {
@@ -62,7 +84,7 @@ fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Com
     CompositionLocalProvider(
         LocalRestaurantOverviewInRestaurantDetailContainer provides customRestaurantOverviewInRestaurantDetailContainer(rootNavController),
         LocalRestaurantMenuInRestaurantDetailContainer provides customRestaurantMenuInRestaurantDetailContainer,
-        LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer,
+        LocalRestaurantReviewInRestaurantDetailContainer provides customRestaurantReviewInRestaurantDetailContainer(rootNavController),
         LocalRestaurantGalleryInRestaurantDetailContainer provides customRestaurantGalleryInRestaurantDetailContainer,
         LocalRestaurantMenuImageLoader provides customLocalRestaurantMenuImageLoader
     ) {
