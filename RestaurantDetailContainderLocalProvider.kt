@@ -56,7 +56,8 @@ val customRestaurantMenuInRestaurantDetailContainer : RestaurantMenuInRestaurant
 fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantReviewInRestaurantDetailContainer = {
     val state = rememberPullToRefreshState()
     val dialogsViewModel: FeedDialogsViewModel = hiltViewModel()
-    FeedScreenByRestaurantId(restaurantId = it,shimmerBrush = { shimmerBrush(it) },
+    FeedScreenByRestaurantId(restaurantId = it,
+        /*shimmerBrush = { shimmerBrush(it) },
         feed = provideFeed(dialogsViewModel = dialogsViewModel, navController = rootNavController.navController, rootNavController = rootNavController, videoPlayer = provideVideoPlayer()),
         pullToRefreshLayout = { isRefreshing, onRefresh, contents ->
             if (isRefreshing) { state.updateState(RefreshIndicatorState.Refreshing) }
@@ -64,7 +65,7 @@ fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNav
             PullToRefreshLayout(pullRefreshLayoutState = state, refreshThreshold = 80, onRefresh = onRefresh) {
                 contents.invoke() }
         },
-        bottomDetectingLazyColumn = provideBottomDetectingLazyColumn()
+        bottomDetectingLazyColumn = provideBottomDetectingLazyColumn()*/
         )
 }
 
