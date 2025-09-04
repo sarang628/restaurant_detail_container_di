@@ -20,6 +20,7 @@ import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
 import com.sarang.torang.compose.restaurantdetail.RestaurantOverViewScreen
+import com.sarang.torang.compose.restaurantdetail.feed.LocalRestaurantFeed
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.LocalRestaurantGalleryInRestaurantDetailContainer
 import com.sarang.torang.compose.type.LocalRestaurantMenuInRestaurantDetailContainer
@@ -41,6 +42,7 @@ import com.sarang.torang.di.feed_di.shimmerBrush
 import com.sarang.torang.di.image.provideTorangAsyncImage
 import com.sarang.torang.di.main_di.provideFeed
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
+import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantFeedType
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 import com.sarang.torang.di.video.provideVideoPlayer
@@ -53,9 +55,16 @@ import com.sryang.library.pullrefresh.rememberPullToRefreshState
 fun customRestaurantOverviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantOverviewInRestaurantDetailContainer = {
     CompositionLocalProvider(
         LocalRestaurantOverViewImageLoader provides restaurantOverViewImageLoader,
-        LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo,
+        LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo(rootNavController),
+        LocalFeedImageLoader provides CustomFeedImageLoader,
+        LocalExpandableTextType provides CustomExpandableTextType,
+        LocalRestaurantFeed provides CustomRestaurantFeedType
     ) {
-        RestaurantOverViewScreen(restaurantId = it, onProfile = {rootNavController.profile(it)}, onContents = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onContents: ${it}"); rootNavController.review(it)})
+        RestaurantOverViewScreen(restaurantId = it,
+            onProfile = {rootNavController.profile(it)},
+            onContents = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onContents: ${it}"); rootNavController.review(it)},
+            onLocation = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onLocation") }
+        )
     }
 }
 
