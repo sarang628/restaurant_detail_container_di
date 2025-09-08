@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
+import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RestaurantNavScreen
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryScreen
 import com.sarang.torang.compose.feed.FeedScreenByRestaurantId
-import com.sarang.torang.compose.feed.FeedScreenByReviewId
 import com.sarang.torang.compose.feed.LocalPullToRefreshLayoutType
 import com.sarang.torang.compose.feed.component.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.component.LocalFeedCompose
@@ -21,6 +21,7 @@ import com.sarang.torang.compose.menu.RestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
 import com.sarang.torang.compose.restaurantdetail.RestaurantOverViewScreen
 import com.sarang.torang.compose.restaurantdetail.feed.LocalRestaurantFeed
+import com.sarang.torang.compose.type.LocalPullToRefresh
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.LocalRestaurantGalleryInRestaurantDetailContainer
 import com.sarang.torang.compose.type.LocalRestaurantMenuInRestaurantDetailContainer
@@ -37,33 +38,33 @@ import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
 import com.sarang.torang.di.feed_di.CustomFeedCompose
 import com.sarang.torang.di.feed_di.CustomPullToRefreshType
-import com.sarang.torang.di.feed_di.provideBottomDetectingLazyColumn
-import com.sarang.torang.di.feed_di.shimmerBrush
 import com.sarang.torang.di.image.provideTorangAsyncImage
-import com.sarang.torang.di.main_di.provideFeed
+import com.sarang.torang.di.restauarnt_info_di.restaurantInfo
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantFeedType
+import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantOverviewPullToRefreshType
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
-import com.sarang.torang.di.video.provideVideoPlayer
 import com.sarang.torang.viewmodels.FeedDialogsViewModel
-import com.sryang.library.pullrefresh.PullToRefreshLayout
-import com.sryang.library.pullrefresh.RefreshIndicatorState
 import com.sryang.library.pullrefresh.rememberPullToRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun customRestaurantOverviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantOverviewInRestaurantDetailContainer = {
+    val restaurantInfoViewModel : RestaurantInfoViewModel = hiltViewModel()
     CompositionLocalProvider(
         LocalRestaurantOverViewImageLoader provides restaurantOverViewImageLoader,
-        LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo(rootNavController),
+        LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel),
         LocalFeedImageLoader provides CustomFeedImageLoader,
         LocalExpandableTextType provides CustomExpandableTextType,
-        LocalRestaurantFeed provides CustomRestaurantFeedType
+        LocalRestaurantFeed provides CustomRestaurantFeedType,
+        LocalPullToRefresh provides CustomRestaurantOverviewPullToRefreshType
     ) {
         RestaurantOverViewScreen(restaurantId = it,
             onProfile = {rootNavController.profile(it)},
             onContents = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onContents: ${it}"); rootNavController.review(it)},
-            onLocation = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onLocation") }
+            onLocation = { Log.d("__customRestaurantOverviewInRestaurantDetailContainer", "onLocation") },
+            onRefresh = { restaurantInfoViewModel.refresh(it) },
+            isRefreshRestaurantInfo = restaurantInfoViewModel.isRefresh
         )
     }
 }
