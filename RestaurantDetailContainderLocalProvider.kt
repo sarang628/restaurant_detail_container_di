@@ -41,6 +41,7 @@ import com.sarang.torang.di.feed_di.CustomPullToRefreshType
 import com.sarang.torang.di.image.provideTorangAsyncImage
 import com.sarang.torang.di.restauarnt_info_di.restaurantInfo
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
+import com.sarang.torang.di.restaurant_menu_di.customLocalRestaurantMenuImageLoader
 import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantFeedType
 import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantOverviewPullToRefreshType
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewImageLoader
@@ -99,11 +100,6 @@ val customRestaurantGalleryInRestaurantDetailContainer : RestaurantGalleryInRest
     CompositionLocalProvider(LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader) {
     RestaurantGalleryScreen(restaurantId = it)
     }
-}
-
-val customLocalRestaurantMenuImageLoader : RestaurantMenuImageLoader = { modifier, url, width, height, scale ->
-    // 여기서 실제 이미지 로딩 구현 예시
-    provideTorangAsyncImage().invoke(modifier, url, width, height, scale)
 }
 
 fun provideRestaurantDetailContainer(rootNavController: RootNavController): @Composable (NavBackStackEntry)->Unit = {
