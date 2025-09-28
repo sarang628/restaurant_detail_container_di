@@ -13,12 +13,12 @@ import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
 import com.sarang.torang.di.feed_di.CustomFeedCompose
-import com.sarang.torang.di.feed_di.customPullToRefresh
+import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
 
 fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantReviewInRestaurantDetailContainer = {
     CompositionLocalProvider(LocalFeedCompose provides CustomFeedCompose,
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
-        LocalPullToRefreshLayoutType provides customPullToRefresh,
+        LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
         LocalFeedImageLoader provides CustomFeedImageLoader,
         LocalExpandableTextType provides CustomExpandableTextType) {
         FeedScreenByRestaurantId(restaurantId = it)
