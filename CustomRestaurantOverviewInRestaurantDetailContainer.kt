@@ -27,7 +27,7 @@ fun customRestaurantOverviewInRestaurantDetailContainer(rootNavController: RootN
     CompositionLocalProvider(
         LocalRestaurantOverViewImageLoader provides restaurantOverViewImageLoader,
         LocalRestaurantOverviewRestaurantInfo provides restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel),
-        LocalFeedImageLoader provides CustomFeedImageLoader,
+        LocalFeedImageLoader provides { CustomFeedImageLoader().invoke(it) },
         LocalExpandableTextType provides CustomExpandableTextType,
         LocalRestaurantFeed provides CustomRestaurantFeedType,
         LocalPullToRefresh provides CustomRestaurantOverviewPullToRefreshType

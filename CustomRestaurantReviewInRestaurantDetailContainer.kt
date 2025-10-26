@@ -19,7 +19,7 @@ fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNav
     CompositionLocalProvider(LocalFeedCompose provides CustomFeedCompose,
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
         LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
-        LocalFeedImageLoader provides CustomFeedImageLoader,
+        LocalFeedImageLoader provides { CustomFeedImageLoader().invoke(it) },
         LocalExpandableTextType provides CustomExpandableTextType) {
         FeedScreenByRestaurantId(restaurantId = it)
     }
