@@ -38,7 +38,8 @@ fun customRestaurantOverviewInRestaurantDetailContainer(
         LocalExpandableTextType provides CustomExpandableTextType,
         LocalRestaurantFeed provides customRestaurantFeedType(onComment = onComment,
                                                               onShare = onShare,
-                                                              onMenu = onMenu ),
+                                                              onMenu = onMenu,
+                                                              rootNavController = rootNavController),
         LocalPullToRefresh provides CustomRestaurantOverviewPullToRefreshType
     ) {
         RestaurantOverViewScreen(restaurantId = restaurantId,
