@@ -23,9 +23,7 @@ import kotlinx.coroutines.launch
 
 fun provideRestaurantDetailContainer(rootNavController: RootNavController = RootNavController(),
                                      onErrorMessage : (String) -> Unit = { },
-                                     restaurantId : Int = 0
-                                    ): @Composable ()->Unit = {
-    //val restaurantId = it.arguments?.getString("restaurantId")
+                                    ): @Composable (Int)->Unit = { restaurantId ->
     val dialogsViewModel : FeedDialogsViewModel = hiltViewModel()
     val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     val coroutineScope = rememberCoroutineScope()
