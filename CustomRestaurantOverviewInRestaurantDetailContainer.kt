@@ -6,8 +6,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
-import com.sarang.torang.compose.feed.internal.components.LocalExpandableTextType
-import com.sarang.torang.compose.feed.internal.components.LocalFeedImageLoader
+import com.sarang.torang.compose.feed.internal.components.type.LocalExpandableTextType
+import com.sarang.torang.compose.feed.internal.components.type.LocalFeedImageLoader
 import com.sarang.torang.compose.restaurantdetail.RestaurantOverViewScreen
 import com.sarang.torang.compose.restaurantdetail.feed.LocalRestaurantFeed
 import com.sarang.torang.compose.type.LocalPullToRefresh
