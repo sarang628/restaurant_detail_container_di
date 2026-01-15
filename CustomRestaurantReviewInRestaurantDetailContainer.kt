@@ -8,7 +8,7 @@ import com.sarang.torang.compose.feed.internal.components.LocalFeedImageLoader
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
 import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
-import com.sarang.torang.compose.type.RestaurantReviewInRestaurantDetailContainer
+import com.sarang.torang.compose.restaurantdetailcontainer.type.RestaurantReviewInRestaurantDetailContainer
 import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType

@@ -1,6 +1,6 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
-import com.sarang.torang.usecase.FindRestaurantNameByRestaurantIdUseCase
+import com.sarang.torang.usecase.restaurantdetailcontainer.FindRestaurantNameByRestaurantIdUseCase
 import com.sarang.torang.api.ApiRestaurant
 import dagger.Module
 import dagger.Provides

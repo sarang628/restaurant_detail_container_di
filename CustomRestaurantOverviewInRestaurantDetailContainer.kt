@@ -13,7 +13,7 @@ import com.sarang.torang.compose.restaurantdetail.feed.LocalRestaurantFeed
 import com.sarang.torang.compose.type.LocalPullToRefresh
 import com.sarang.torang.compose.type.LocalRestaurantOverViewImageLoader
 import com.sarang.torang.compose.type.LocalRestaurantOverviewRestaurantInfo
-import com.sarang.torang.compose.type.RestaurantOverviewInRestaurantDetailContainer
+import com.sarang.torang.compose.restaurantdetailcontainer.type.RestaurantOverviewInRestaurantDetailContainer
 import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.restaurant_overview_di.CustomRestaurantOverviewPullToRefreshType
