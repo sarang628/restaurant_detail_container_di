@@ -19,7 +19,7 @@ import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
 
 fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantReviewInRestaurantDetailContainer = {
     CompositionLocalProvider(
-        LocalVideoPlayerType provides CustomVideoPlayerType,
+        LocalVideoPlayerType provides CustomVideoPlayerType(),
         LocalFeedCompose provides CustomFeedCompose,
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
         LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
