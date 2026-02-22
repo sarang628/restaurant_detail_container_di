@@ -9,19 +9,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
-import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantNavScreenWithModules
+import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
+import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailPagerWithModules
 import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
+import com.sarang.torang.di.restaurant_overview_di.ProvideRestaurantOverview
+import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 import com.sarang.torang.dialogsbox.compose.DialogsBoxViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun provideRestaurantDetailContainer(rootNavController: RootNavController = RootNavController(),
-                                     onErrorMessage : (String) -> Unit = { },
-                                    ): @Composable (Int)->Unit = { restaurantId ->
+fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNavController(),
+                                  onErrorMessage : (String) -> Unit = { },
+                                  ): @Composable (Int)->Unit = { restaurantId ->
     val dialogsViewModel    : DialogsBoxViewModel   = hiltViewModel()
+    val viewModel : RestaurantInfoViewModel = hiltViewModel()
     val snackBarHostState   : SnackbarHostState     by remember { mutableStateOf(SnackbarHostState()) }
     val isLogin             : Boolean               by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
     val coroutineScope      : CoroutineScope        = rememberCoroutineScope()
@@ -40,13 +45,18 @@ fun provideRestaurantDetailContainer(rootNavController: RootNavController = Root
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader
     ) {
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
-            RestaurantNavScreenWithModules(restaurantId         = restaurantId,
-                                           onBack               = { rootNavController.popBackStack() },
-                                           snackBarHostState    = snackBarHostState,
-                                           overView             = restaurantOverView,
-                                           menu                 = menu,
-                                           review               = review,
-                                           gallery              = gallery)
+            RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
+                                             onBack               = { rootNavController.popBackStack() },
+                                             snackBarHostState    = snackBarHostState,
+                                             overView             = restaurantOverView,
+                                             menu                 = menu,
+                                             review               = review,
+                                             gallery              = gallery,
+                                             restaurantOverviewInfo = {
+                                                 restaurantOverViewRestaurantInfo(rootNavController = rootNavController,
+                                                                                  viewModel = viewModel).invoke(it)
+                                             }
+            )
         }
     }
 }
