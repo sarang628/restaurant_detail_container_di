@@ -9,11 +9,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailPagerWithModules
+import com.sarang.torang.compose.type.LocalRestaurantOverviewRestaurantInfo
+import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
 import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
+import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 import com.sarang.torang.dialogsbox.compose.DialogsBoxViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,6 +37,8 @@ fun provideRestaurantDetailPager(rootNavController: RootNavController = RootNavC
         onErrorMessage = { coroutineScope.launch {
             snackBarHostState.showSnackbar(it)
         }})
+
+
     val menu = customRestaurantMenuInRestaurantDetailContainer
     val review = customRestaurantReviewInRestaurantDetailContainer(rootNavController)
     val gallery = customRestaurantGalleryInRestaurantDetailContainer

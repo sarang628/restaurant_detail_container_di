@@ -14,6 +14,7 @@ import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailPagerWithModules
+import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
 import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
 import com.sarang.torang.di.restaurant_overview_di.ProvideRestaurantOverview
@@ -26,10 +27,10 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                   onErrorMessage : (String) -> Unit = { },
                                   ): @Composable (Int)->Unit = { restaurantId ->
     val dialogsViewModel    : DialogsBoxViewModel   = hiltViewModel()
-    val viewModel : RestaurantInfoViewModel = hiltViewModel()
     val snackBarHostState   : SnackbarHostState     by remember { mutableStateOf(SnackbarHostState()) }
     val isLogin             : Boolean               by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
     val coroutineScope      : CoroutineScope        = rememberCoroutineScope()
+    val restaurantInfoViewModel : RestaurantInfoViewModel = hiltViewModel()
     val restaurantOverView = customRestaurantOverviewInRestaurantDetailContainer(rootNavController = rootNavController,
         onMenu = dialogsViewModel::onMenu,
         onShare = { if(isLogin) dialogsViewModel.onShare(it)
@@ -41,21 +42,19 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
     val menu = customRestaurantMenuInRestaurantDetailContainer
     val review = customRestaurantReviewInRestaurantDetailContainer(rootNavController)
     val gallery = customRestaurantGalleryInRestaurantDetailContainer
+    val restaurantOverView1 : RestaurantOverviewRestaurantInfo = restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
     CompositionLocalProvider(
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader
     ) {
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
             RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
-                                             onBack               = { rootNavController.popBackStack() },
-                                             snackBarHostState    = snackBarHostState,
-                                             overView             = restaurantOverView,
-                                             menu                 = menu,
-                                             review               = review,
-                                             gallery              = gallery,
-                                             restaurantOverviewInfo = {
-                                                 restaurantOverViewRestaurantInfo(rootNavController = rootNavController,
-                                                                                  viewModel = viewModel).invoke(it)
-                                             }
+                                                    onBack               = { rootNavController.popBackStack() },
+                                                    snackBarHostState    = snackBarHostState,
+                                                    overView             = restaurantOverView1,
+                                                    menu                 = menu,
+                                                    review               = review,
+                                                    gallery              = gallery,
+                                                    restaurantOverviewInfo = { restaurantOverView1.invoke(restaurantId) }
             )
         }
     }
