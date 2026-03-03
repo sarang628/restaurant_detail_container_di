@@ -1,61 +1,143 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
+import com.sarang.torang.compose.RestaurantGalleryViewModel
+import com.sarang.torang.compose.feed.internal.components.type.LocalExpandableTextType
+import com.sarang.torang.compose.feed.internal.components.type.LocalFeedImageLoader
+import com.sarang.torang.compose.feed.internal.components.type.LocalVideoPlayerType
+import com.sarang.torang.compose.feed.type.FeedTypeData
+import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
+import com.sarang.torang.compose.feed.type.LocalFeedCompose
+import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
+import com.sarang.torang.compose.menu.MenuItem
+import com.sarang.torang.compose.menu.RestaurantMenuViewModel
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
-import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailPagerWithModules
+import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
+import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
+import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
+import com.sarang.torang.di.basefeed_di.CustomVideoPlayerType
 import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
+import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
+import com.sarang.torang.di.feed_di.CustomFeedCompose
+import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
+import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
-import com.sarang.torang.di.restaurant_overview_di.ProvideRestaurantOverview
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 import com.sarang.torang.dialogsbox.compose.DialogsBoxViewModel
+import com.sarang.torang.viewmodels.FeedScreenByRestaurantIdViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNavController(),
                                   onErrorMessage : (String) -> Unit = { },
                                   ): @Composable (Int)->Unit = { restaurantId ->
-    val dialogsViewModel    : DialogsBoxViewModel   = hiltViewModel()
+    val dialogsViewModel        : DialogsBoxViewModel   = hiltViewModel()
+    val restaurantInfoViewModel : RestaurantInfoViewModel = hiltViewModel()
+    val menuViewModel           : RestaurantMenuViewModel = hiltViewModel()
+    val feedsViewModel          : FeedScreenByRestaurantIdViewModel = hiltViewModel()
+    val galleryViewModel        : RestaurantGalleryViewModel = hiltViewModel()
     val snackBarHostState   : SnackbarHostState     by remember { mutableStateOf(SnackbarHostState()) }
     val isLogin             : Boolean               by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
     val coroutineScope      : CoroutineScope        = rememberCoroutineScope()
-    val restaurantInfoViewModel : RestaurantInfoViewModel = hiltViewModel()
-    val restaurantOverView = customRestaurantOverviewInRestaurantDetailContainer(rootNavController = rootNavController,
-        onMenu = dialogsViewModel::onMenu,
-        onShare = { if(isLogin) dialogsViewModel.onShare(it)
-                    else rootNavController.emailLogin() },
-        onComment = dialogsViewModel::onComment,
-        onErrorMessage = { coroutineScope.launch {
-            snackBarHostState.showSnackbar(it)
-        }})
-    val menu = customRestaurantMenuInRestaurantDetailContainer
-    val review = customRestaurantReviewInRestaurantDetailContainer(rootNavController)
-    val gallery = customRestaurantGalleryInRestaurantDetailContainer
-    val restaurantOverView1 : RestaurantOverviewRestaurantInfo = restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
+    val overView : RestaurantOverviewRestaurantInfo = restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
+
+    LaunchedEffect(restaurantId) {
+        menuViewModel.loadMenu(restaurantId)
+        feedsViewModel.getFeedByRestaurantId(restaurantId)
+        galleryViewModel.loadImage(restaurantId)
+    }
+
+
     CompositionLocalProvider(
-        LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader
+        LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
+        LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
+        //for feed
+        LocalVideoPlayerType provides CustomVideoPlayerType(),
+        LocalFeedCompose provides CustomFeedCompose,
+        LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
+        LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
+        LocalFeedImageLoader provides { CustomFeedImageLoader().invoke(it) },
+        LocalExpandableTextType provides CustomExpandableTextType,
+        // for gallery
+        LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader
     ) {
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
             RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
+                                                    menuListcontent = {
+                                                        items(menuViewModel.uiState){
+                                                            MenuItem(menu = it)
+                                                        }
+                                                    },
                                                     onBack               = { rootNavController.popBackStack() },
                                                     snackBarHostState    = snackBarHostState,
-                                                    overView             = restaurantOverView1,
-                                                    menu                 = menu,
-                                                    review               = review,
-                                                    gallery              = gallery,
-                                                    restaurantOverviewInfo = { restaurantOverView1.invoke(restaurantId) }
+                                                    reviewListContent    = {
+                                                        items(feedsViewModel.feedUiState.list){
+                                                            LocalFeedCompose.current.invoke(
+                                                                FeedTypeData(
+                                                                    feed            = it,
+                                                                    //onLike          = feedCallBack.onLike,
+                                                                    //onFavorite      = feedCallBack.onFavorite,
+                                                                    //onVideoClick    = { feedCallBack.onVideoClick.invoke(uiState.list[it].reviewId) },
+                                                                    //pageScrollable  = feedScreenConfig.pageScrollable,
+                                                                    //isLogin         = uiState.isLogin,
+                                                                    //imageHeight     = uiState.imageHeight(
+                                                                     //   density = LocalDensity.current,
+                                                                     //   screenWidthDp = LocalConfiguration.current.screenWidthDp,
+                                                                     //   screenHeightDp = LocalConfiguration.current.screenHeightDp
+                                                                    //),
+                                                                    //isPlaying = (playingIndex == it) && shouldPlay
+                                                                )
+                                                            )
+                                                        }
+                                                    },
+                                                    galleryContent         = {
+                                                        items(galleryViewModel.uiState){
+                                                            LocalRestaurantGalleryImageLoader.current.invoke(
+                                                                Modifier
+                                                                    .fillMaxSize()
+                                                                    .wrapContentSize()
+                                                                    .clickable {
+                                                                        //onImage.invoke(list[it].id)
+                                                                    },
+                                                                it.url.replaceM3u8WithJpg(),
+                                                                null,
+                                                                null,
+                                                                ContentScale.Crop
+                                                            )
+                                                        }
+                                                    },
+                                                    restaurantOverviewInfo = { overView.invoke(restaurantId) },
+                                                    menuItemCount = menuViewModel.uiState.size,
+                                                    reviewItemCount = feedsViewModel.feedUiState.list.size,
+                                                    galleryItemCount = galleryViewModel.uiState.size
+
             )
         }
+    }
+}
+
+fun String.replaceM3u8WithJpg(): String {
+    return if (this.endsWith(".m3u8", ignoreCase = true)) {
+        this.replace(Regex("\\.m3u8$", RegexOption.IGNORE_CASE), ".jpg")
+    } else {
+        this
     }
 }

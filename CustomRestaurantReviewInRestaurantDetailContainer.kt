@@ -9,7 +9,7 @@ import com.sarang.torang.compose.feed.internal.components.type.LocalVideoPlayerT
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
 import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
-import com.sarang.torang.compose.restaurantdetailcontainer.type.RestaurantReviewInRestaurantDetailContainer
+import com.sarang.torang.compose.restaurantdetailcontainer.type.ReviewList
 import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.basefeed_di.CustomVideoPlayerType
@@ -17,7 +17,7 @@ import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
 import com.sarang.torang.di.feed_di.CustomFeedCompose
 import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
 
-fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : RestaurantReviewInRestaurantDetailContainer = {
+fun customRestaurantReviewInRestaurantDetailContainer(rootNavController: RootNavController) : ReviewList = {
     CompositionLocalProvider(
         LocalVideoPlayerType provides CustomVideoPlayerType(),
         LocalFeedCompose provides CustomFeedCompose,

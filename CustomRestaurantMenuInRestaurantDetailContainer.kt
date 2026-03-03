@@ -9,11 +9,11 @@ import androidx.compose.ui.unit.dp
 import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.LocalRestaurantMenuPullToRefresh
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
-import com.sarang.torang.compose.restaurantdetailcontainer.type.RestaurantMenuInRestaurantDetailContainer
+import com.sarang.torang.compose.restaurantdetailcontainer.type.MenuList
 import com.sarang.torang.di.restaurant_menu_di.CustomRestaurantMenuPullToRefresh
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
 
-val customRestaurantMenuInRestaurantDetailContainer : RestaurantMenuInRestaurantDetailContainer = {
+val customRestaurantMenuInRestaurantDetailContainer : MenuList = {
     CompositionLocalProvider(LocalRestaurantMenuPullToRefresh provides CustomRestaurantMenuPullToRefresh,
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader
     ){
