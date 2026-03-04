@@ -1,5 +1,6 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
@@ -45,6 +46,8 @@ import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantI
 import com.sarang.torang.dialogsbox.compose.DialogsBoxViewModel
 import com.sarang.torang.viewmodels.FeedScreenByRestaurantIdViewModel
 import kotlinx.coroutines.CoroutineScope
+
+private val tag = "__ProvideRestaurantDetailColumn"
 
 fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNavController(),
                                   onErrorMessage : (String) -> Unit = { },
