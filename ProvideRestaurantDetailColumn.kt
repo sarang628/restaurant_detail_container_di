@@ -1,11 +1,17 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
-import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -15,11 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryViewModel
+import com.sarang.torang.compose.component.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.feed.internal.components.type.LocalExpandableTextType
 import com.sarang.torang.compose.feed.internal.components.type.LocalFeedImageLoader
 import com.sarang.torang.compose.feed.internal.components.type.LocalVideoPlayerType
@@ -27,9 +37,9 @@ import com.sarang.torang.compose.feed.type.FeedTypeData
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
 import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
-import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.menu.MenuItem
 import com.sarang.torang.compose.menu.RestaurantMenuViewModel
+import com.sarang.torang.compose.menu.SmallMenuItem
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
@@ -71,7 +81,6 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
 
     CompositionLocalProvider(
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
-        LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
         //for feed
         LocalVideoPlayerType provides CustomVideoPlayerType(),
         LocalFeedCompose provides CustomFeedCompose,
@@ -82,16 +91,32 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         // for gallery
         LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader
     ) {
+        val menus = menuViewModel.uiState.chunked(3)
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
             RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
                                                     menuListcontent = {
-                                                        items(menuViewModel.uiState){
-                                                            MenuItem(menu = it)
+                                                        item { HeaderText("Menu") }
+                                                        items(menus){
+                                                            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp),
+                                                                horizontalArrangement = Arrangement.SpaceEvenly) {
+                                                                for (item in it) {
+                                                                    SmallMenuItem(modifier  = Modifier.weight(1f),
+                                                                                  menu      = item)
+                                                                }
+
+                                                                // 만약 마지막 줄이 3개가 안 될 경우 빈 공간을 채워주는 처리
+                                                                if (menus.size < 3) {
+                                                                    repeat(3 - menus.size) {
+                                                                        Spacer(modifier = Modifier.weight(1f))
+                                                                    }
+                                                                }
+                                                            }
                                                         }
                                                     },
                                                     onBack               = { rootNavController.popBackStack() },
                                                     snackBarHostState    = snackBarHostState,
                                                     reviewListContent    = {
+                                                        item { HeaderText("Review") }
                                                         items(feedsViewModel.feedUiState.list){
                                                             LocalFeedCompose.current.invoke(
                                                                 FeedTypeData(
@@ -112,6 +137,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                                         }
                                                     },
                                                     galleryContent         = {
+                                                        item { HeaderText("Gallery") }
                                                         items(galleryViewModel.uiState){
                                                             LocalRestaurantGalleryImageLoader.current.invoke(
                                                                 Modifier
@@ -128,13 +154,20 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                                         }
                                                     },
                                                     restaurantOverviewInfo = { overView.invoke(restaurantId) },
-                                                    menuItemCount = menuViewModel.uiState.size,
+                                                    menuItemCount = menuViewModel.uiState.size / 3 + (menuViewModel.uiState.size % 3).coerceAtMost(1),
                                                     reviewItemCount = feedsViewModel.feedUiState.list.size,
                                                     galleryItemCount = galleryViewModel.uiState.size
 
             )
         }
     }
+}
+
+@Composable fun HeaderText(text : String = ""){
+    Text(modifier   = Modifier.padding(8.dp),
+        text       = text,
+        fontSize   = 20.sp,
+        fontWeight = FontWeight.Bold)
 }
 
 fun String.replaceM3u8WithJpg(): String {

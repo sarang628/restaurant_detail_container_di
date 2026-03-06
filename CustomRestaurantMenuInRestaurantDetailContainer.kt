@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sarang.torang.compose.menu.LocalRestaurantMenuImageLoader
-import com.sarang.torang.compose.menu.LocalRestaurantMenuPullToRefresh
+import com.sarang.torang.compose.component.menu.LocalRestaurantMenuImageLoader
+import com.sarang.torang.compose.component.menu.LocalRestaurantMenuPullToRefresh
 import com.sarang.torang.compose.menu.RestaurantMenuScreen
 import com.sarang.torang.compose.restaurantdetailcontainer.type.MenuList
 import com.sarang.torang.di.restaurant_menu_di.CustomRestaurantMenuPullToRefresh
