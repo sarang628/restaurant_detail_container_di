@@ -40,6 +40,7 @@ import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
 import com.sarang.torang.compose.menu.MenuItem
 import com.sarang.torang.compose.menu.RestaurantMenuViewModel
 import com.sarang.torang.compose.menu.SmallMenuItem
+import com.sarang.torang.compose.menu.restaurantMenuList
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
 import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
@@ -91,27 +92,12 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         // for gallery
         LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader
     ) {
-        val menus = menuViewModel.uiState.chunked(3)
+        val menus = menuViewModel.uiState
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
             RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
                                                     menuListcontent = {
                                                         item { HeaderText("Menu") }
-                                                        items(menus){
-                                                            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp),
-                                                                horizontalArrangement = Arrangement.SpaceEvenly) {
-                                                                for (item in it) {
-                                                                    SmallMenuItem(modifier  = Modifier.weight(1f),
-                                                                                  menu      = item)
-                                                                }
-
-                                                                // 만약 마지막 줄이 3개가 안 될 경우 빈 공간을 채워주는 처리
-                                                                if (menus.size < 3) {
-                                                                    repeat(3 - menus.size) {
-                                                                        Spacer(modifier = Modifier.weight(1f))
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
+                                                        restaurantMenuList(menus)
                                                     },
                                                     onBack               = { rootNavController.popBackStack() },
                                                     snackBarHostState    = snackBarHostState,
