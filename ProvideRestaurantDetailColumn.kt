@@ -1,12 +1,7 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.items
@@ -37,9 +32,7 @@ import com.sarang.torang.compose.feed.type.FeedTypeData
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
 import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
-import com.sarang.torang.compose.menu.MenuItem
 import com.sarang.torang.compose.menu.RestaurantMenuViewModel
-import com.sarang.torang.compose.menu.SmallMenuItem
 import com.sarang.torang.compose.menu.restaurantMenuList
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
@@ -95,7 +88,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         val menus = menuViewModel.uiState
         ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
             RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
-                                                    menuListcontent = {
+                                                    menuListContent = {
                                                         item { HeaderText("Menu") }
                                                         restaurantMenuList(menus)
                                                     },
@@ -140,7 +133,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                                         }
                                                     },
                                                     restaurantOverviewInfo = { overView.invoke(restaurantId) },
-                                                    menuItemCount = menuViewModel.uiState.size / 3 + (menuViewModel.uiState.size % 3).coerceAtMost(1),
+                                                    menuItemCount = menuViewModel.uiState.size,
                                                     reviewItemCount = feedsViewModel.feedUiState.list.size,
                                                     galleryItemCount = galleryViewModel.uiState.size
 
