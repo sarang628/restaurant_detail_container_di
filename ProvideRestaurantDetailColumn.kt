@@ -1,10 +1,14 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -117,30 +122,91 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                                     },
                                                     galleryContent         = {
                                                         item { HeaderText("Gallery") }
-                                                        items(galleryViewModel.uiState){
-                                                            LocalRestaurantGalleryImageLoader.current.invoke(
-                                                                Modifier
-                                                                    .fillMaxSize()
-                                                                    .wrapContentSize()
-                                                                    .clickable {
-                                                                        //onImage.invoke(list[it].id)
-                                                                    },
-                                                                it.url.replaceM3u8WithJpg(),
-                                                                null,
-                                                                null,
-                                                                ContentScale.Crop
-                                                            )
+                                                        items(galleryViewModel.galleryImages()){
+                                                            ImageRow(it)
                                                         }
                                                     },
                                                     restaurantOverviewInfo = { overView.invoke(restaurantId) },
                                                     menuItemCount = menuViewModel.uiState.size,
                                                     reviewItemCount = feedsViewModel.feedUiState.list.size,
-                                                    galleryItemCount = galleryViewModel.uiState.size
+                                                    galleryItemCount = galleryViewModel.galleryImages().size
 
             )
         }
     }
 }
+
+@Composable
+fun ImageRow(galleryImages: GalleryImages){
+    Row(Modifier.fillMaxWidth()) {
+        LocalRestaurantGalleryImageLoader.current.invoke(
+            Modifier.padding(bottom = 12.dp)
+                .fillMaxWidth()
+                .height(120.dp)
+                .weight(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable {
+                    //onImage.invoke(list[it].id)
+                },
+            galleryImages.image1.second.replaceM3u8WithJpg(),
+            null,
+            null,
+            ContentScale.Crop
+        )
+        Spacer(Modifier.width(12.dp))
+        galleryImages.image2?.let {
+            LocalRestaurantGalleryImageLoader.current.invoke(
+                Modifier.padding(bottom = 12.dp)
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        //onImage.invoke(list[it].id)
+                    },
+                it.second.replaceM3u8WithJpg(),
+                null,
+                null,
+                ContentScale.Crop
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        galleryImages.image3?.let {
+            LocalRestaurantGalleryImageLoader.current.invoke(
+                Modifier.padding(bottom = 12.dp)
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        //onImage.invoke(list[it].id)
+                    },
+                it.second.replaceM3u8WithJpg(),
+                null,
+                null,
+                ContentScale.Crop
+            )
+        }
+    }
+}
+
+
+fun RestaurantGalleryViewModel.galleryImages() : List<GalleryImages>{
+    return this.uiState.chunked(3){chunk ->
+        GalleryImages(
+            image1 = chunk[0].let { it.id to it.url },
+            image2 = chunk.getOrNull(1)?.let { it.id to it.url },
+            image3 = chunk.getOrNull(2)?.let { it.id to it.url }
+        )
+    }
+}
+
+data class GalleryImages(
+    val image1 : Pair<Int, String>,
+    val image2 : Pair<Int, String>? = null,
+    val image3 : Pair<Int, String>? = null,
+)
+
 
 @Composable fun HeaderText(text : String = ""){
     Text(modifier   = Modifier.padding(8.dp),
