@@ -30,9 +30,9 @@ import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
 import com.sarang.torang.compose.RestaurantGalleryViewModel
 import com.sarang.torang.compose.component.menu.LocalRestaurantMenuImageLoader
-import com.sarang.torang.compose.feed.internal.components.type.LocalExpandableTextType
-import com.sarang.torang.compose.feed.internal.components.type.LocalFeedImageLoader
-import com.sarang.torang.compose.feed.internal.components.type.LocalVideoPlayerType
+import com.sarang.torang.compose.component.type.LocalExpandableTextType
+import com.sarang.torang.compose.component.type.LocalFeedImageLoader
+import com.sarang.torang.compose.component.type.LocalVideoPlayerType
 import com.sarang.torang.compose.feed.type.FeedTypeData
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
@@ -49,6 +49,7 @@ import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
 import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
 import com.sarang.torang.di.feed_di.CustomFeedCompose
 import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
+import com.sarang.torang.di.feed_di.provideFeedGridPicture
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
@@ -82,7 +83,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
         //for feed
         LocalVideoPlayerType provides CustomVideoPlayerType(),
-        LocalFeedCompose provides CustomFeedCompose,
+        LocalFeedCompose provides provideFeedGridPicture(),
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
         LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
         LocalFeedImageLoader provides { CustomFeedImageLoader().invoke(it) },
