@@ -141,7 +141,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
 fun ImageRow(galleryImages: GalleryImages){
     Row(Modifier.fillMaxWidth()) {
         LocalRestaurantGalleryImageLoader.current.invoke(
-            Modifier.padding(bottom = 12.dp)
+            Modifier.padding(bottom = 8.dp)
                 .fillMaxWidth()
                 .height(120.dp)
                 .weight(1f)
@@ -154,10 +154,10 @@ fun ImageRow(galleryImages: GalleryImages){
             null,
             ContentScale.Crop
         )
-        Spacer(Modifier.width(12.dp))
         galleryImages.image2?.let {
+            Spacer(Modifier.width(8.dp))
             LocalRestaurantGalleryImageLoader.current.invoke(
-                Modifier.padding(bottom = 12.dp)
+                Modifier.padding(bottom = 8.dp)
                     .fillMaxWidth()
                     .height(120.dp)
                     .weight(1f)
@@ -171,10 +171,11 @@ fun ImageRow(galleryImages: GalleryImages){
                 ContentScale.Crop
             )
         }
-        Spacer(Modifier.width(12.dp))
+
         galleryImages.image3?.let {
+            Spacer(Modifier.width(8.dp))
             LocalRestaurantGalleryImageLoader.current.invoke(
-                Modifier.padding(bottom = 12.dp)
+                Modifier.padding(bottom = 8.dp)
                     .fillMaxWidth()
                     .height(120.dp)
                     .weight(1f)
