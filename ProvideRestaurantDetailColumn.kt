@@ -1,14 +1,7 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarang.torang.RestaurantInfoViewModel
 import com.sarang.torang.RootNavController
+import com.sarang.torang.compose.ImageRow
 import com.sarang.torang.compose.RestaurantGalleryViewModel
 import com.sarang.torang.compose.component.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.component.type.LocalExpandableTextType
@@ -37,18 +29,17 @@ import com.sarang.torang.compose.feed.type.FeedTypeData
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
 import com.sarang.torang.compose.feed.type.LocalPullToRefreshLayoutType
+import com.sarang.torang.compose.galleryImages
 import com.sarang.torang.compose.menu.RestaurantMenuViewModel
 import com.sarang.torang.compose.menu.restaurantMenuList
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
-import com.sarang.torang.compose.type.RestaurantGalleryImageLoaderData
 import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
 import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
 import com.sarang.torang.di.basefeed_di.CustomVideoPlayerType
 import com.sarang.torang.di.dialogsbox_di.ProvideDialogsBox
 import com.sarang.torang.di.feed_di.CustomBottomDetectingLazyColumnType
-import com.sarang.torang.di.feed_di.CustomFeedCompose
 import com.sarang.torang.di.feed_di.customPullToRefreshforRestaurantReview
 import com.sarang.torang.di.feed_di.provideFeedGridPicture
 import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
@@ -63,15 +54,16 @@ private val tag = "__ProvideRestaurantDetailColumn"
 fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNavController(),
                                   onErrorMessage : (String) -> Unit = { },
                                   ): @Composable (Int)->Unit = { restaurantId ->
-    val dialogsViewModel        : DialogsBoxViewModel   = hiltViewModel()
-    val restaurantInfoViewModel : RestaurantInfoViewModel = hiltViewModel()
-    val menuViewModel           : RestaurantMenuViewModel = hiltViewModel()
-    val feedsViewModel          : FeedScreenByRestaurantIdViewModel = hiltViewModel()
-    val galleryViewModel        : RestaurantGalleryViewModel = hiltViewModel()
-    val snackBarHostState   : SnackbarHostState     by remember { mutableStateOf(SnackbarHostState()) }
-    val isLogin             : Boolean               by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
-    val coroutineScope      : CoroutineScope        = rememberCoroutineScope()
-    val overView : RestaurantOverviewRestaurantInfo = restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
+    val dialogsViewModel: DialogsBoxViewModel = hiltViewModel()
+    val restaurantInfoViewModel: RestaurantInfoViewModel = hiltViewModel()
+    val menuViewModel: RestaurantMenuViewModel = hiltViewModel()
+    val feedsViewModel: FeedScreenByRestaurantIdViewModel = hiltViewModel()
+    val galleryViewModel: RestaurantGalleryViewModel = hiltViewModel()
+    val snackBarHostState: SnackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    val isLogin: Boolean by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    val overView: RestaurantOverviewRestaurantInfo =
+        restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
 
     LaunchedEffect(restaurantId) {
         menuViewModel.loadMenu(restaurantId)
@@ -79,6 +71,50 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         galleryViewModel.loadImage(restaurantId)
     }
 
+    val restaurantDetailColumn : @Composable () -> Unit = {
+        RestaurantDetailColumnScreenWithModules(
+            restaurantId = restaurantId,
+            onBack = { rootNavController.popBackStack() },
+            snackBarHostState = snackBarHostState,
+            menuItemCount = menuViewModel.uiState.size,
+            reviewItemCount = feedsViewModel.feedUiState.list.size,
+            galleryItemCount = galleryViewModel.galleryImages().size,
+            restaurantOverviewInfo = { overView.invoke(restaurantId) },
+            menuListContent = {
+                item { HeaderText("Menu") }
+                restaurantMenuList(menuViewModel.uiState)
+            },
+            reviewListContent = {
+                item { HeaderText("Review") }
+                items(feedsViewModel.feedUiState.list) {
+                    LocalFeedCompose.current.invoke(
+                        FeedTypeData(
+                            feed = it,
+                            //onLike          = feedCallBack.onLike,
+                            //onFavorite      = feedCallBack.onFavorite,
+                            //onVideoClick    = { feedCallBack.onVideoClick.invoke(uiState.list[it].reviewId) },
+                            //pageScrollable  = feedScreenConfig.pageScrollable,
+                            //isLogin         = uiState.isLogin,
+                            //imageHeight     = uiState.imageHeight(
+                            //   density = LocalDensity.current,
+                            //   screenWidthDp = LocalConfiguration.current.screenWidthDp,
+                            //   screenHeightDp = LocalConfiguration.current.screenHeightDp
+                            //),
+                            //isPlaying = (playingIndex == it) && shouldPlay
+                        )
+                    )
+                }
+            },
+            galleryContent = {
+                item { HeaderText("Gallery") }
+                items(galleryViewModel.galleryImages()) {
+                    ImageRow(
+                        galleryImages = it,
+                        onImage = { })
+                }
+            },
+        )
+    }
 
     CompositionLocalProvider(
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
@@ -92,88 +128,9 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         // for gallery
         LocalRestaurantGalleryImageLoader provides restaurantGalleryImageLoader
     ) {
-        val menus = menuViewModel.uiState
-        ProvideDialogsBox(dialogsViewModel = dialogsViewModel) {
-            RestaurantDetailColumnScreenWithModules(restaurantId         = restaurantId,
-                                                    menuListContent = {
-                                                        item { HeaderText("Menu") }
-                                                        restaurantMenuList(menus)
-                                                    },
-                                                    onBack               = { rootNavController.popBackStack() },
-                                                    snackBarHostState    = snackBarHostState,
-                                                    reviewListContent    = {
-                                                        item { HeaderText("Review") }
-                                                        items(feedsViewModel.feedUiState.list){
-                                                            LocalFeedCompose.current.invoke(
-                                                                FeedTypeData(
-                                                                    feed            = it,
-                                                                    //onLike          = feedCallBack.onLike,
-                                                                    //onFavorite      = feedCallBack.onFavorite,
-                                                                    //onVideoClick    = { feedCallBack.onVideoClick.invoke(uiState.list[it].reviewId) },
-                                                                    //pageScrollable  = feedScreenConfig.pageScrollable,
-                                                                    //isLogin         = uiState.isLogin,
-                                                                    //imageHeight     = uiState.imageHeight(
-                                                                     //   density = LocalDensity.current,
-                                                                     //   screenWidthDp = LocalConfiguration.current.screenWidthDp,
-                                                                     //   screenHeightDp = LocalConfiguration.current.screenHeightDp
-                                                                    //),
-                                                                    //isPlaying = (playingIndex == it) && shouldPlay
-                                                                )
-                                                            )
-                                                        }
-                                                    },
-                                                    galleryContent         = {
-                                                        item { HeaderText("Gallery") }
-                                                        items(galleryViewModel.galleryImages()){
-                                                            ImageRow(galleryImages = it,
-                                                                     onImage = { })
-                                                        }
-                                                    },
-                                                    restaurantOverviewInfo = { overView.invoke(restaurantId) },
-                                                    menuItemCount = menuViewModel.uiState.size,
-                                                    reviewItemCount = feedsViewModel.feedUiState.list.size,
-                                                    galleryItemCount = galleryViewModel.galleryImages().size
-
-            )
-        }
+        ProvideDialogsBox(dialogsViewModel = dialogsViewModel) { restaurantDetailColumn.invoke() }
     }
 }
-
-@Composable
-fun ImageRow(galleryImages: GalleryImages,
-             onImage : (Int) -> Unit = {}){
-    Row(Modifier.fillMaxWidth()) {
-        galleryImages.images.forEach {
-            LocalRestaurantGalleryImageLoader.current.invoke(
-                RestaurantGalleryImageLoaderData(
-                    Modifier.padding(bottom = 8.dp)
-                            .fillMaxWidth()
-                            .height(120.dp)
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                onImage.invoke(it.first)
-                            },
-                    url = it.second.replaceM3u8WithJpg(),
-                    contentScale = ContentScale.Crop
-                )
-            )
-        }
-    }
-}
-
-
-fun RestaurantGalleryViewModel.galleryImages() : List<GalleryImages>{
-    return this.uiState.chunked(3){chunk ->
-        GalleryImages(
-            images = chunk.map { it.id to it.url },
-        )
-    }
-}
-
-data class GalleryImages(
-    val images : List<Pair<Int, String>>
-)
 
 
 @Composable fun HeaderText(text : String = ""){
@@ -181,12 +138,4 @@ data class GalleryImages(
         text       = text,
         fontSize   = 20.sp,
         fontWeight = FontWeight.Bold)
-}
-
-fun String.replaceM3u8WithJpg(): String {
-    return if (this.endsWith(".m3u8", ignoreCase = true)) {
-        this.replace(Regex("\\.m3u8$", RegexOption.IGNORE_CASE), ".jpg")
-    } else {
-        this
-    }
 }
