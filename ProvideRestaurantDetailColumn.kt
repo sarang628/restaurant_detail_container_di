@@ -41,6 +41,7 @@ import com.sarang.torang.compose.menu.RestaurantMenuViewModel
 import com.sarang.torang.compose.menu.restaurantMenuList
 import com.sarang.torang.compose.restaurantdetailcontainer.RestaurantDetailColumnScreenWithModules
 import com.sarang.torang.compose.type.LocalRestaurantGalleryImageLoader
+import com.sarang.torang.compose.type.RestaurantGalleryImageLoaderData
 import com.sarang.torang.compose.type.RestaurantOverviewRestaurantInfo
 import com.sarang.torang.di.basefeed_di.CustomExpandableTextType
 import com.sarang.torang.di.basefeed_di.CustomFeedImageLoader
@@ -124,7 +125,8 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                                                     galleryContent         = {
                                                         item { HeaderText("Gallery") }
                                                         items(galleryViewModel.galleryImages()){
-                                                            ImageRow(it)
+                                                            ImageRow(galleryImages = it,
+                                                                     onImage = { })
                                                         }
                                                     },
                                                     restaurantOverviewInfo = { overView.invoke(restaurantId) },
@@ -138,55 +140,23 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
 }
 
 @Composable
-fun ImageRow(galleryImages: GalleryImages){
+fun ImageRow(galleryImages: GalleryImages,
+             onImage : (Int) -> Unit = {}){
     Row(Modifier.fillMaxWidth()) {
-        LocalRestaurantGalleryImageLoader.current.invoke(
-            Modifier.padding(bottom = 8.dp)
-                .fillMaxWidth()
-                .height(120.dp)
-                .weight(1f)
-                .clip(RoundedCornerShape(8.dp))
-                .clickable {
-                    //onImage.invoke(list[it].id)
-                },
-            galleryImages.image1.second.replaceM3u8WithJpg(),
-            null,
-            null,
-            ContentScale.Crop
-        )
-        galleryImages.image2?.let {
-            Spacer(Modifier.width(8.dp))
+        galleryImages.images.forEach {
             LocalRestaurantGalleryImageLoader.current.invoke(
-                Modifier.padding(bottom = 8.dp)
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .weight(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        //onImage.invoke(list[it].id)
-                    },
-                it.second.replaceM3u8WithJpg(),
-                null,
-                null,
-                ContentScale.Crop
-            )
-        }
-
-        galleryImages.image3?.let {
-            Spacer(Modifier.width(8.dp))
-            LocalRestaurantGalleryImageLoader.current.invoke(
-                Modifier.padding(bottom = 8.dp)
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .weight(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        //onImage.invoke(list[it].id)
-                    },
-                it.second.replaceM3u8WithJpg(),
-                null,
-                null,
-                ContentScale.Crop
+                RestaurantGalleryImageLoaderData(
+                    Modifier.padding(bottom = 8.dp)
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                onImage.invoke(it.first)
+                            },
+                    url = it.second.replaceM3u8WithJpg(),
+                    contentScale = ContentScale.Crop
+                )
             )
         }
     }
@@ -196,17 +166,13 @@ fun ImageRow(galleryImages: GalleryImages){
 fun RestaurantGalleryViewModel.galleryImages() : List<GalleryImages>{
     return this.uiState.chunked(3){chunk ->
         GalleryImages(
-            image1 = chunk[0].let { it.id to it.url },
-            image2 = chunk.getOrNull(1)?.let { it.id to it.url },
-            image3 = chunk.getOrNull(2)?.let { it.id to it.url }
+            images = chunk.map { it.id to it.url },
         )
     }
 }
 
 data class GalleryImages(
-    val image1 : Pair<Int, String>,
-    val image2 : Pair<Int, String>? = null,
-    val image3 : Pair<Int, String>? = null,
+    val images : List<Pair<Int, String>>
 )
 
 
