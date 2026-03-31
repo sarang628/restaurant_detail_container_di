@@ -1,5 +1,6 @@
 package com.sarang.torang.di.restaurant_detail_container_di
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
@@ -25,6 +26,7 @@ import com.sarang.torang.compose.component.menu.LocalRestaurantMenuImageLoader
 import com.sarang.torang.compose.component.type.LocalExpandableTextType
 import com.sarang.torang.compose.component.type.LocalFeedImageLoader
 import com.sarang.torang.compose.component.type.LocalVideoPlayerType
+import com.sarang.torang.compose.feed.FeedScreenByRestaurantIdViewModel
 import com.sarang.torang.compose.feed.type.FeedTypeData
 import com.sarang.torang.compose.feed.type.LocalBottomDetectingLazyColumnType
 import com.sarang.torang.compose.feed.type.LocalFeedCompose
@@ -46,7 +48,6 @@ import com.sarang.torang.di.restaurant_gallery_di.restaurantGalleryImageLoader
 import com.sarang.torang.di.restaurant_menu_di.customRestaurantMenuImageLoader
 import com.sarang.torang.di.restaurant_overview_di.restaurantOverViewRestaurantInfo
 import com.sarang.torang.dialogsbox.compose.DialogsBoxViewModel
-import com.sarang.torang.viewmodels.FeedScreenByRestaurantIdViewModel
 import kotlinx.coroutines.CoroutineScope
 
 private val tag = "__ProvideRestaurantDetailColumn"
@@ -90,16 +91,11 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                     LocalFeedCompose.current.invoke(
                         FeedTypeData(
                             feed = it,
-                            //onLike          = feedCallBack.onLike,
-                            //onFavorite      = feedCallBack.onFavorite,
-                            //onVideoClick    = { feedCallBack.onVideoClick.invoke(uiState.list[it].reviewId) },
-                            //pageScrollable  = feedScreenConfig.pageScrollable,
-                            //isLogin         = uiState.isLogin,
-                            //imageHeight     = uiState.imageHeight(
-                            //   density = LocalDensity.current,
-                            //   screenWidthDp = LocalConfiguration.current.screenWidthDp,
-                            //   screenHeightDp = LocalConfiguration.current.screenHeightDp
-                            //),
+                            onLike          = feedsViewModel::onLike,
+                            onFavorite      = feedsViewModel::onFavorite,
+                            onVideoClick    = { feedsViewModel.onVideoClick(it.reviewId) },
+                            pageScrollable  = true,
+                            isLogin         = isLogin,
                             //isPlaying = (playingIndex == it) && shouldPlay
                         )
                     )
@@ -110,7 +106,7 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
                 items(galleryViewModel.galleryImages()) {
                     ImageRow(
                         galleryImages = it,
-                        onImage = { })
+                        onImage = { Log.d(tag,"click image : $it") })
                 }
             },
         )
@@ -120,7 +116,9 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
         //for feed
         LocalVideoPlayerType provides CustomVideoPlayerType(),
-        LocalFeedCompose provides provideFeedGridPicture(),
+        LocalFeedCompose provides provideFeedGridPicture(onComment = dialogsViewModel::onComment,
+                                                         onShare = dialogsViewModel::onShare,
+                                                         onMenu = dialogsViewModel::onMenu),
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
         LocalPullToRefreshLayoutType provides customPullToRefreshforRestaurantReview,
         LocalFeedImageLoader provides { CustomFeedImageLoader().invoke(it) },
