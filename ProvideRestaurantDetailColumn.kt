@@ -116,7 +116,8 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         LocalRestaurantMenuImageLoader provides customRestaurantMenuImageLoader,
         //for feed
         LocalVideoPlayerType provides CustomVideoPlayerType(),
-        LocalFeedCompose provides provideFeedGridPicture(onComment = dialogsViewModel::onComment,
+        LocalFeedCompose provides provideFeedGridPicture(rootNavController = rootNavController,
+                                                         onComment = dialogsViewModel::onComment,
                                                          onShare = dialogsViewModel::onShare,
                                                          onMenu = dialogsViewModel::onMenu),
         LocalBottomDetectingLazyColumnType provides CustomBottomDetectingLazyColumnType,
