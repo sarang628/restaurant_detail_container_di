@@ -2,6 +2,7 @@ package com.sarang.torang.di.restaurant_detail_container_di
 
 import android.util.Log
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -53,18 +54,15 @@ import kotlinx.coroutines.CoroutineScope
 private val tag = "__ProvideRestaurantDetailColumn"
 
 fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNavController(),
-                                  onErrorMessage : (String) -> Unit = { },
-                                  ): @Composable (Int)->Unit = { restaurantId ->
-    val dialogsViewModel: DialogsBoxViewModel = hiltViewModel()
-    val restaurantInfoViewModel: RestaurantInfoViewModel = hiltViewModel()
-    val menuViewModel: RestaurantMenuViewModel = hiltViewModel()
-    val feedsViewModel: FeedScreenByRestaurantIdViewModel = hiltViewModel()
-    val galleryViewModel: RestaurantGalleryViewModel = hiltViewModel()
-    val snackBarHostState: SnackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
-    val isLogin: Boolean by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
-    val overView: RestaurantOverviewRestaurantInfo =
-        restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
+                                  onErrorMessage : (String) -> Unit = { }, ): @Composable (Int)->Unit = { restaurantId ->
+    val dialogsViewModel        : DialogsBoxViewModel               = hiltViewModel()
+    val restaurantInfoViewModel : RestaurantInfoViewModel           = hiltViewModel()
+    val menuViewModel           : RestaurantMenuViewModel           = hiltViewModel()
+    val feedsViewModel          : FeedScreenByRestaurantIdViewModel = hiltViewModel()
+    val galleryViewModel        : RestaurantGalleryViewModel        = hiltViewModel()
+    val snackBarHostState       : SnackbarHostState                 by remember { mutableStateOf(SnackbarHostState()) }
+    val isLogin                 : Boolean                           by dialogsViewModel.isLogin.collectAsStateWithLifecycle()
+    val overView                : RestaurantOverviewRestaurantInfo  = restaurantOverViewRestaurantInfo(rootNavController, restaurantInfoViewModel)
 
     LaunchedEffect(restaurantId) {
         menuViewModel.loadMenu(restaurantId)
@@ -72,44 +70,48 @@ fun ProvideRestaurantDetailColumn(rootNavController: RootNavController = RootNav
         galleryViewModel.loadImage(restaurantId)
     }
 
+    val menuListContent : LazyListScope.() -> Unit = {
+        item { HeaderText("Menu") }
+        restaurantMenuList(menuViewModel.uiState)
+    }
+
+    val reviewListContent : LazyListScope.() -> Unit = {
+        item { HeaderText("Review") }
+        items(feedsViewModel.feedUiState.list) {
+            LocalFeedCompose.current.invoke(
+                FeedTypeData(
+                    feed = it,
+                    onLike          = feedsViewModel::onLike,
+                    onFavorite      = feedsViewModel::onFavorite,
+                    onVideoClick    = { feedsViewModel.onVideoClick(it.reviewId) },
+                    pageScrollable  = true,
+                    isLogin         = isLogin,
+                    //isPlaying = (playingIndex == it) && shouldPlay
+                )
+            )
+        }
+    }
+
+    val galleryContent : LazyListScope.() -> Unit = {
+        item { HeaderText("Gallery") }
+        items(galleryViewModel.galleryImages()) {
+            ImageRow(galleryImages  = it,
+                     onImage        = { rootNavController.restaurantImagePager(it) })
+        }
+    }
+
     val restaurantDetailColumn : @Composable () -> Unit = {
         RestaurantDetailColumnScreenWithModules(
-            restaurantId = restaurantId,
-            onBack = { rootNavController.popBackStack() },
-            snackBarHostState = snackBarHostState,
-            menuItemCount = menuViewModel.uiState.size,
-            reviewItemCount = feedsViewModel.feedUiState.list.size,
-            galleryItemCount = galleryViewModel.galleryImages().size,
-            restaurantOverviewInfo = { overView.invoke(restaurantId) },
-            menuListContent = {
-                item { HeaderText("Menu") }
-                restaurantMenuList(menuViewModel.uiState)
-            },
-            reviewListContent = {
-                item { HeaderText("Review") }
-                items(feedsViewModel.feedUiState.list) {
-                    LocalFeedCompose.current.invoke(
-                        FeedTypeData(
-                            feed = it,
-                            onLike          = feedsViewModel::onLike,
-                            onFavorite      = feedsViewModel::onFavorite,
-                            onVideoClick    = { feedsViewModel.onVideoClick(it.reviewId) },
-                            pageScrollable  = true,
-                            isLogin         = isLogin,
-                            //isPlaying = (playingIndex == it) && shouldPlay
-                        )
-                    )
-                }
-            },
-            galleryContent = {
-                item { HeaderText("Gallery") }
-                items(galleryViewModel.galleryImages()) {
-                    ImageRow(
-                        galleryImages = it,
-                        onImage = { Log.d(tag,"click image : $it") })
-                }
-            },
-        )
+            restaurantId            = restaurantId,
+            onBack                  = { rootNavController.popBackStack() },
+            snackBarHostState       = snackBarHostState,
+            menuItemCount           = menuViewModel.uiState.size,
+            reviewItemCount         = feedsViewModel.feedUiState.list.size,
+            galleryItemCount        = galleryViewModel.galleryImages().size,
+            restaurantOverviewInfo  = { overView.invoke(restaurantId) },
+            menuListContent         = menuListContent,
+            reviewListContent       = reviewListContent,
+            galleryContent          = galleryContent )
     }
 
     CompositionLocalProvider(
